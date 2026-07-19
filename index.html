@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ray Tsai — Backend Engineer (Go)</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+
+    --paper:#F7F8FA; --surface:#FFFFFF; --sunken:#F1F3F6;
+    --ink:#14181F; --muted:#586070; --faint:#98A0AC;
+    --line:#E4E8EC; --line-strong:#D3D8DE;
+    --accent:#0F766E; --accent-2:#0D9488; --on-accent:#FFFFFF;
+    --glow: rgba(15,118,110,.09);
+    --shadow: 0 1px 2px rgba(20,24,31,.04), 0 8px 30px rgba(20,24,31,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#0B0E13; --surface:#11151C; --sunken:#0E1218;
+      --ink:#E9ECF1; --muted:#98A1AE; --faint:#69727F;
+      --line:#212833; --line-strong:#2C3542;
+      --accent:#2DD4BF; --accent-2:#5EEAD4; --on-accent:#04211E;
+      --glow: rgba(45,212,191,.12);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 40px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#F7F8FA; --surface:#FFFFFF; --sunken:#F1F3F6;
+    --ink:#14181F; --muted:#586070; --faint:#98A0AC;
+    --line:#E4E8EC; --line-strong:#D3D8DE;
+    --accent:#0F766E; --accent-2:#0D9488; --on-accent:#FFFFFF;
+    --glow: rgba(15,118,110,.09);
+    --shadow: 0 1px 2px rgba(20,24,31,.04), 0 8px 30px rgba(20,24,31,.05);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B0E13; --surface:#11151C; --sunken:#0E1218;
+    --ink:#E9ECF1; --muted:#98A1AE; --faint:#69727F;
+    --line:#212833; --line-strong:#2C3542;
+    --accent:#2DD4BF; --accent-2:#5EEAD4; --on-accent:#04211E;
+    --glow: rgba(45,212,191,.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 40px rgba(0,0,0,.35);
+  }
+
+  title{display:none;}
+  *{box-sizing:border-box;}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.62;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    font-feature-settings:"kern" 1;
+  }
+  ::selection{ background:var(--accent); color:var(--on-accent); }
+  a{ color:var(--accent-2); text-decoration:none; }
+  a:hover{ text-decoration:underline; text-underline-offset:3px; }
+  a:focus-visible, .metric:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
+
+  .wrap{ width:min(880px, 92vw); margin:0 auto; padding:clamp(2.4rem,6vw,4.5rem) 0 4rem; }
+
+  /* ---- shared bits ---- */
+  .eyebrow{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent-2); display:flex; align-items:center; gap:.7ch;
+  }
+  .eyebrow::before{ content:""; width:1.6ch; height:2px; background:var(--accent); display:inline-block; }
+  .mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+  main{ display:flex; flex-direction:column; }
+  section{ padding:clamp(2.2rem,5vw,3.4rem) 0; border-top:1px solid var(--line); }
+
+  /* ---- hero ---- */
+  .hero{ padding-top:0; border-top:0; }
+  .hero .role{ font-family:var(--mono); font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 1.1rem; }
+  .hero h1{
+    font-size:clamp(2.5rem,7.4vw,4.3rem); line-height:.98; letter-spacing:-.02em;
+    font-weight:850; margin:0; text-wrap:balance;
+  }
+  .hero h1 .zh{ font-weight:650; color:var(--muted); font-size:.44em; letter-spacing:.02em; margin-left:.6ch; }
+  .thesis{
+    font-size:clamp(1.18rem,2.5vw,1.5rem); line-height:1.4; font-weight:450;
+    max-width:34ch; margin:1.5rem 0 0; text-wrap:pretty; color:var(--ink);
+  }
+  .thesis b{ font-weight:650; color:var(--accent-2); box-shadow:inset 0 -.42em 0 var(--glow); }
+  .contacts{
+    display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; margin-top:1.7rem;
+    font-family:var(--mono); font-size:.82rem; color:var(--muted);
+  }
+  .contacts span, .contacts a{ display:inline-flex; align-items:center; gap:.55ch; }
+  .contacts .dot{ width:6px;height:6px;border-radius:50%;background:var(--accent); }
+
+  .signal{ margin-top:2rem; height:54px; width:100%; display:block; }
+
+  /* ---- stat panel ---- */
+  .stats{
+    margin-top:1.4rem; display:grid; grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface);
+    box-shadow:var(--shadow);
+  }
+  .stat{ padding:1.05rem 1.1rem; border-left:1px solid var(--line); }
+  .stat:first-child{ border-left:0; }
+  .stat .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.55rem; font-weight:600; letter-spacing:-.01em; color:var(--ink); line-height:1.05; }
+  .stat .num em{ font-style:normal; color:var(--accent-2); }
+  .stat .lbl{ margin-top:.35rem; font-size:.74rem; line-height:1.3; color:var(--muted); }
+
+  /* ---- section heads ---- */
+  .sec-head{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin-bottom:1.6rem; flex-wrap:wrap; }
+  .sec-head h2{ font-size:1.34rem; font-weight:750; letter-spacing:-.01em; margin:.5rem 0 0; }
+
+  /* ---- experience ---- */
+  .job-top{ display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; }
+  .job-top h3{ font-size:1.12rem; font-weight:700; margin:0; }
+  .job-top .when{ font-family:var(--mono); font-size:.78rem; color:var(--faint); white-space:nowrap; }
+  .job-sub{ color:var(--muted); font-size:.95rem; margin:.25rem 0 1.3rem; }
+  .facets{ display:grid; grid-template-columns:1fr 1fr; gap:1.6rem 2rem; }
+  .facet{ display:flex; flex-direction:column; gap:.35rem; }
+  .facet .tag{ font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); }
+  .facet p{ margin:0; font-size:.93rem; line-height:1.5; color:var(--ink); }
+  .facet p b{ font-weight:650; }
+
+  /* ---- incidents ---- */
+  .incidents{ display:flex; flex-direction:column; gap:.9rem; }
+  .inc{
+    border:1px solid var(--line); border-radius:10px; background:var(--surface);
+    padding:1.15rem 1.25rem; position:relative; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.5rem 1.2rem; align-items:start;
+  }
+  .inc::before{ content:""; position:absolute; left:0; top:1.2rem; bottom:1.2rem; width:2px; background:var(--accent); border-radius:2px; }
+  .inc .cat{ grid-column:1/-1; font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); }
+  .inc h4{ grid-column:1/-1; font-size:1.02rem; font-weight:700; margin:.05rem 0 .35rem; line-height:1.3; }
+  .inc .body{ grid-column:1/-1; display:flex; flex-direction:column; gap:.4rem; }
+  .inc .row{ font-size:.9rem; line-height:1.48; color:var(--muted); }
+  .inc .row b{ color:var(--ink); font-weight:600; font-family:var(--mono); font-size:.76rem; letter-spacing:.05em; text-transform:uppercase; margin-right:.6ch; }
+  .inc .result{ font-size:.92rem; color:var(--ink); }
+  .inc .result .big{ font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--accent-2); font-weight:600; }
+
+  /* ---- projects ---- */
+  .projects{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .proj{ border:1px solid var(--line); border-radius:10px; background:var(--surface); padding:1.15rem 1.25rem; display:flex; flex-direction:column; box-shadow:var(--shadow); }
+  .proj h3{ font-size:1.04rem; font-weight:700; margin:0 0 .2rem; }
+  .proj .live{ font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-2); display:inline-flex; align-items:center; gap:.6ch; margin-bottom:.7rem; }
+  .proj .live .pulse{ width:7px;height:7px;border-radius:50%;background:var(--accent); box-shadow:0 0 0 0 var(--accent); }
+  .proj p{ margin:0 0 .9rem; font-size:.9rem; line-height:1.52; color:var(--muted); }
+  .proj p b{ color:var(--ink); font-weight:600; }
+  .chips{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:auto; }
+  .chip{ font-family:var(--mono); font-size:.7rem; padding:.2rem .55rem; border:1px solid var(--line-strong); border-radius:5px; color:var(--muted); }
+
+  /* ---- skills ---- */
+  .skillgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.3rem 2rem; }
+  .skillrow .k{ font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin-bottom:.55rem; }
+  .skillrow .v{ display:flex; flex-wrap:wrap; gap:.4rem; }
+
+  /* ---- education / footer ---- */
+  .edu{ display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; }
+  .edu h3{ font-size:1.05rem; font-weight:700; margin:0; }
+  .edu .when{ font-family:var(--mono); font-size:.78rem; color:var(--faint); }
+  .edu p{ margin:.2rem 0 0; color:var(--muted); font-size:.92rem; }
+  footer{ border-top:1px solid var(--line); padding:2rem 0 0; margin-top:1rem; color:var(--faint); font-family:var(--mono); font-size:.74rem; letter-spacing:.04em; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+
+  @media (max-width:640px){
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .stat:nth-child(3){ border-left:0; }
+    .stat:nth-child(3), .stat:nth-child(4){ border-top:1px solid var(--line); }
+    .facets{ grid-template-columns:1fr; }
+    .projects{ grid-template-columns:1fr; }
+    .skillgrid{ grid-template-columns:1fr; }
+    .inc{ grid-template-columns:1fr; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } }
+  @media print{
+    body{ background:#fff; color:#000; font-size:11pt; }
+    .signal, .stat, .inc, .proj{ box-shadow:none; }
+    section{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <main>
+    <header class="hero">
+      <p class="role">Backend Engineer · Go</p>
+      <h1>Ray Tsai<span class="zh">蔡川海</span></h1>
+      <p class="thesis">I build backend systems that move real money — where <b>one duplicated or stale signal means a wrong order in a live brokerage account.</b></p>
+
+      <div class="contacts">
+        <a href="mailto:rr900306@gmail.com"><span class="dot"></span>rr900306@gmail.com</a>
+        <a href="https://www.linkedin.com/in/%E5%B7%9D%E6%B5%B7-%E8%94%A1-83996b326/" target="_blank" rel="noopener">LinkedIn</a>
+        <span>Taichung, Taiwan · open to remote</span>
+      </div>
+
+      <canvas class="signal" aria-hidden="true"></canvas>
+
+      <div class="stats" role="list" aria-label="Career highlights">
+        <div class="stat" role="listitem"><div class="num">3</div><div class="lbl">live fintech products, sole backend owner</div></div>
+        <div class="stat" role="listitem"><div class="num">~2,000</div><div class="lbl">commits across 19 months</div></div>
+        <div class="stat" role="listitem"><div class="num"><em>72%</em></div><div class="lbl">of the core product API server</div></div>
+        <div class="stat" role="listitem"><div class="num">NT$400K<em>+</em></div><div class="lbl">monthly volume processed</div></div>
+      </div>
+    </header>
+
+    <section>
+      <div class="sec-head">
+        <div><p class="eyebrow">Experience</p><h2>Sole backend owner of three trading products</h2></div>
+      </div>
+      <div class="job-top">
+        <h3>Sky Mirror Technology (天鏡科技) — Backend Engineer</h3>
+        <span class="when">2024 — present · Taichung</span>
+      </div>
+      <p class="job-sub">Only backend engineer for ElTrade (strategy-signal platform), ParaNinja (quantitative trading) and SikaX (order-execution terminal). API design, concurrency architecture, data layer, payments, Kubernetes deployment and on-call — end to end, on a ~940K-line Go monorepo (86 microservices, 470+ endpoints).</p>
+      <div class="facets">
+        <div class="facet"><span class="tag">Payments</span><p>Built the NewebPay integration and ECPay flow — recurring billing, refunds, reconciliation — processing <b>NT$400K+ / month</b> with fully automated government e-invoicing.</p></div>
+        <div class="facet"><span class="tag">Live&nbsp;trading</span><p><b>~50 signal writes/sec</b> at peak through a three-layer dedup defense plus idempotent NATS JetStream msgIDs, so redelivery storms never double-execute a real order.</p></div>
+        <div class="facet"><span class="tag">Combo&nbsp;engine</span><p>Workflow engine blending multi-strategy signals by weight into one net position, with fixed-point math (±10000 bps) and configurable lot rounding.</p></div>
+        <div class="facet"><span class="tag">Notifications</span><p>Standalone microservice for all products — 10-worker async pool, Redis email queue with squared backoff, two-tier Telegram rate limiting, SSRF-hardened webhooks.</p></div>
+        <div class="facet"><span class="tag">Identity</span><p>OAuth 2.0 on both sides — provider (auth-code, scoped delegation) and consumer (Google / LINE) with multi-provider account binding.</p></div>
+        <div class="facet"><span class="tag">Reliability</span><p>Unified WebSocket transport, hot/cold data archival, two-phase GDPR anonymization, and 30+ production cron jobs with a p50/p95/p99 dashboard.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><p class="eyebrow">Selected incidents</p><h2>Root cause, or it isn't fixed</h2></div>
+      </div>
+      <div class="incidents">
+        <article class="inc">
+          <span class="cat">Idempotency · distributed delivery</span>
+          <h4>A single signal written 29 times, 703 rows polluted</h4>
+          <div class="body">
+            <p class="row"><b>Cause</b>An upstream outage triggered at-least-once redelivery while the downstream sync path had zero idempotency.</p>
+            <p class="row"><b>Fix</b>Cut the source, SQL window-function dedup cleanup, replayed 75 affected strategies, then made delivery idempotent on <span class="mono">(strategy_id, signal_time, status)</span>.</p>
+            <p class="result">Worst case cut from <span class="big">29×&nbsp;→&nbsp;~2×</span>.</p>
+          </div>
+        </article>
+        <article class="inc">
+          <span class="cat">Concurrency · row locking</span>
+          <h4>SSO logging users out for an hour at a time</h4>
+          <div class="body">
+            <p class="row"><b>Cause</b>Token refresh fired from three unlocked check-then-act sites and clobbered each other — inferred from two rows' contradictory timestamps.</p>
+            <p class="row"><b>Fix</b>An <span class="mono">EnsureFreshToken</span> path with a <span class="mono">SELECT FOR UPDATE</span> row lock serializing all three call sites; rejected an optimistic guard on purpose.</p>
+            <p class="result">Regression test asserts <span class="big">1 refresh</span> under 4-way concurrency.</p>
+          </div>
+        </article>
+        <article class="inc">
+          <span class="cat">Resource leak · storage engine</span>
+          <h4>Pre-market cleanup ran 10 hours, cleared 1 of 189 days</h4>
+          <div class="body">
+            <p class="row"><b>Cause</b>Blind-deleting ~2,900 InfluxDB measurements daily, amplified ~8× by an 8-year backfill, exhausted file descriptors.</p>
+            <p class="row"><b>Fix</b>Scan-then-delete — count first, delete only measurements that actually hold data — established as a team operations rule.</p>
+            <p class="result">Reads are <span class="big">~10× cheaper</span> than deletes; job stable.</p>
+          </div>
+        </article>
+        <article class="inc">
+          <span class="cat">Silent failure · observability</span>
+          <h4>Three hours of alerts, zero trades placed</h4>
+          <div class="body">
+            <p class="row"><b>Cause</b>The SDK silently ran live strategies in backtest semantics, disabling quantity clamping so every order failed a cash check.</p>
+            <p class="row"><b>Fix</b>Eliminated six hypotheses with evidence, fixed mode propagation and made cash handling live-aware.</p>
+            <p class="result">Live execution restored the <span class="big">same day</span>.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><p class="eyebrow">Projects</p><h2>Shipped end to end</h2></div>
+      </div>
+      <div class="projects">
+        <article class="proj">
+          <h3>Badminton session manager</h3>
+          <span class="live"><span class="pulse"></span>Live · real users</span>
+          <p>Solo 0→1 product — backend, frontend, DevOps. Started on <b>AWS Lambda + DynamoDB</b>; when Lambda couldn't hold WebSockets I migrated the backend to a <b>256 MB Fly.io machine</b> and hand-wrote an in-process WebSocket hub. Google / LINE OAuth from scratch and a fair-rotation waitlist algorithm.</p>
+          <div class="chips"><span class="chip">Go · Gin</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span><span class="chip">OAuth 2.0</span></div>
+        </article>
+        <article class="proj">
+          <h3>Taiwan-stock AI briefing</h3>
+          <span class="live"><span class="pulse"></span>Automated · daily</span>
+          <p>A fully automated pre-market screener that runs every trading day. <b>Multi-model division of labor</b> — one model for broad research, one for judgment — filters instruments by volume and ranks upside/risk, enforcing "evidence-backed, no guessing," delivered to Telegram with day-by-day tracking.</p>
+          <div class="chips"><span class="chip">Scheduling</span><span class="chip">Multi-model AI</span><span class="chip">Telegram</span><span class="chip">Data-driven</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><p class="eyebrow">Stack</p><h2>What I reach for</h2></div>
+      </div>
+      <div class="skillgrid">
+        <div class="skillrow"><div class="k">Language &amp; core</div><div class="v">
+          <span class="chip">Go (Golang)</span><span class="chip">Concurrency</span><span class="chip">Gin</span><span class="chip">Python</span><span class="chip">Rust</span><span class="chip">TypeScript / React</span>
+        </div></div>
+        <div class="skillrow"><div class="k">Data &amp; messaging</div><div class="v">
+          <span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">NATS JetStream</span><span class="chip">InfluxDB</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span>
+        </div></div>
+        <div class="skillrow"><div class="k">Infra &amp; cloud</div><div class="v">
+          <span class="chip">Kubernetes</span><span class="chip">Docker</span><span class="chip">Helm</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span><span class="chip">CI/CD</span>
+        </div></div>
+        <div class="skillrow"><div class="k">Practices</div><div class="v">
+          <span class="chip">Idempotency</span><span class="chip">Distributed systems</span><span class="chip">System design</span><span class="chip">Payments / OAuth 2.0</span><span class="chip">Incident root-cause</span>
+        </div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><p class="eyebrow">Education</p><h2>Foundations</h2></div>
+      </div>
+      <div class="edu">
+        <div>
+          <h3>National Yunlin University of Science and Technology</h3>
+          <p>B.S., Computer Science &amp; Information Engineering · 雲林科技大學 資訊工程系</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Ray Tsai · 蔡川海</span>
+      <span>Backend Engineer (Go) · Fintech &amp; real-time systems</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  var c = document.querySelector('.signal');
+  if(!c || !c.getContext) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ctx, W, H, pts, accent;
+
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  function build(){
+    var dpr = Math.min(window.devicePixelRatio||1, 2);
+    W = c.clientWidth; H = c.clientHeight;
+    c.width = Math.round(W*dpr); c.height = Math.round(H*dpr);
+    ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    accent = css('--accent') || '#0f766e';
+    // deterministic signal: mostly flat with a few "trade" spikes
+    var n = Math.max(60, Math.floor(W/9));
+    pts = [];
+    var mid = H*0.55, y = mid, seed = 7;
+    function rnd(){ seed = (seed*9301+49297)%233280; return seed/233280; }
+    for(var i=0;i<=n;i++){
+      var t=i/n;
+      y += (mid - y)*0.06 + (rnd()-0.5)*3.2;
+      if(rnd()>0.94){ y += (rnd()-0.5)*H*0.7; }        // occasional spike
+      y = Math.max(6, Math.min(H-6, y));
+      pts.push({x:t*W, y:y});
+    }
+    pts[pts.length-1].y = mid - H*0.22; // land on an up-tick
+  }
+
+  function draw(prog){
+    ctx.clearRect(0,0,W,H);
+    // baseline
+    ctx.strokeStyle = css('--line-strong') || '#d3d8de';
+    ctx.lineWidth = 1; ctx.globalAlpha = .8;
+    ctx.beginPath(); ctx.moveTo(0, H*0.55); ctx.lineTo(W, H*0.55); ctx.stroke();
+    ctx.globalAlpha = 1;
+    // signal
+    var upto = Math.floor(pts.length*prog);
+    ctx.strokeStyle = accent; ctx.lineWidth = 1.6; ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    for(var i=0;i<upto;i++){ i?ctx.lineTo(pts[i].x,pts[i].y):ctx.moveTo(pts[i].x,pts[i].y); }
+    ctx.stroke();
+    // endpoint marker
+    if(upto>1){
+      var p = pts[upto-1];
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.arc(p.x,p.y,3,0,7); ctx.fill();
+      ctx.globalAlpha=.18; ctx.beginPath(); ctx.arc(p.x,p.y,7,0,7); ctx.fill(); ctx.globalAlpha=1;
+    }
+  }
+
+  function run(){
+    build();
+    if(reduce){ draw(1); return; }
+    var start=null, dur=1100;
+    function step(ts){
+      if(!start) start=ts;
+      var p=Math.min(1,(ts-start)/dur);
+      var e=1-Math.pow(1-p,3);
+      draw(e);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var t;
+  window.addEventListener('resize', function(){ clearTimeout(t); t=setTimeout(function(){ build(); draw(1); },150); });
+  // redraw on theme toggle so the accent stays correct
+  var mo = new MutationObserver(function(){ build(); draw(1); });
+  mo.observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  if(window.matchMedia){ try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ build(); draw(1); }); }catch(e){} }
+
+  run();
+})();
+</script>
+</body>
+</html>
