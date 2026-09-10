@@ -182,13 +182,14 @@
 <div class="wrap">
   <main>
     <header class="hero">
-      <p class="role">Backend Engineer · Go</p>
+      <p class="role">Backend Engineer · Go · ships full-stack</p>
       <h1>Ray Tsai<span class="zh">蔡川海</span></h1>
       <p class="thesis">I build backend systems that move real money — where <b>one duplicated or stale signal means a wrong order in a live brokerage account.</b></p>
 
       <div class="contacts">
         <a href="mailto:rr900306@gmail.com"><span class="dot"></span>rr900306@gmail.com</a>
         <a href="https://www.linkedin.com/in/%E5%B7%9D%E6%B5%B7-%E8%94%A1-83996b326/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/qq900306ss" target="_blank" rel="noopener">GitHub</a>
         <span>Taichung, Taiwan · open to remote</span>
       </div>
 
@@ -210,13 +211,15 @@
         <h3>Sky Mirror Technology (天鏡科技) — Backend Engineer</h3>
         <span class="when">2024 — present · Taichung</span>
       </div>
-      <p class="job-sub">Only backend engineer for ElTrade (strategy-signal platform), ParaNinja (quantitative trading) and SikaX (order-execution terminal). API design, concurrency architecture, data layer, payments, Kubernetes deployment and on-call — end to end, on a ~940K-line Go monorepo (86 microservices, 470+ endpoints).</p>
+      <p class="job-sub">Backend owner for ElTrade (strategy-signal platform), ParaNinja (quantitative trading) and SikaX (order-execution terminal) — API design, concurrency architecture, data layer, payments, Kubernetes deployment and on-call, end to end on a ~940K-line Go monorepo (86 microservices, 470+ endpoints). Second-largest contributor repo-wide, and I ship the front ends for these products too.</p>
       <div class="facets">
         <div class="facet"><span class="tag">Payments</span><p>Built the NewebPay integration and ECPay flow — recurring billing, refunds, reconciliation — processing <b>NT$400K+ / month</b> with fully automated government e-invoicing.</p></div>
         <div class="facet"><span class="tag">Live&nbsp;trading</span><p><b>~50 signal writes/sec</b> at peak through a three-layer dedup defense plus idempotent NATS JetStream msgIDs, so redelivery storms never double-execute a real order.</p></div>
         <div class="facet"><span class="tag">Combo&nbsp;engine</span><p>Workflow engine blending multi-strategy signals by weight into one net position, with fixed-point math (±10000 bps) and configurable lot rounding.</p></div>
         <div class="facet"><span class="tag">Notifications</span><p>Standalone microservice for all products — 10-worker async pool, Redis email queue with squared backoff, two-tier Telegram rate limiting, SSRF-hardened webhooks.</p></div>
         <div class="facet"><span class="tag">Identity</span><p>OAuth 2.0 on both sides — provider (auth-code, scoped delegation) and consumer (Google / LINE) with multi-provider account binding.</p></div>
+        <div class="facet"><span class="tag">Front&nbsp;end</span><p>Top contributor to the ParaNinja front end at <b>54% of its commits</b>; 570 commits on the primary trading front end and 36% of the admin console — API design and shipped UI owned by the same person.</p></div>
+        <div class="facet"><span class="tag">Mentoring</span><p>Since <b>July 2026</b>, onboarding three new backend engineers — architecture walkthroughs, task shaping, and code review gate-keeping standards and production-risk patterns.</p></div>
         <div class="facet"><span class="tag">Reliability</span><p>Unified WebSocket transport, hot/cold data archival, two-phase GDPR anonymization, and 30+ production cron jobs with a p50/p95/p99 dashboard.</p></div>
       </div>
     </section>
@@ -272,12 +275,14 @@
       <div class="projects">
         <article class="proj">
           <h3>Badminton session manager</h3>
+          <p class="links" style="margin:0 0 .55rem;font-family:var(--mono);font-size:.72rem;"><a href="https://d2mg2bpjvlg672.cloudfront.net/" target="_blank" rel="noopener">live app</a> · <a href="https://d1r9u0ja59y4rv.cloudfront.net/" target="_blank" rel="noopener">admin</a> · <a href="https://github.com/qq900306ss/badminton-booking" target="_blank" rel="noopener">source</a></p>
           <span class="live"><span class="pulse"></span>Live · real users</span>
           <p>Solo 0→1 product — backend, frontend, DevOps. Started on <b>AWS Lambda + DynamoDB</b>; when Lambda couldn't hold WebSockets I migrated the backend to a <b>256 MB Fly.io machine</b> and hand-wrote an in-process WebSocket hub. Google / LINE OAuth from scratch and a fair-rotation waitlist algorithm.</p>
           <div class="chips"><span class="chip">Go · Gin</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span><span class="chip">OAuth 2.0</span></div>
         </article>
         <article class="proj">
           <h3>Taiwan-stock AI briefing</h3>
+          <p class="links" style="margin:0 0 .55rem;font-family:var(--mono);font-size:.72rem;"><a href="https://github.com/qq900306ss/tw-stock-ai-daily" target="_blank" rel="noopener">source</a></p>
           <span class="live"><span class="pulse"></span>Automated · daily</span>
           <p>A fully automated pre-market screener that runs every trading day. <b>Multi-model division of labor</b> — one model for broad research, one for judgment — filters instruments by volume and ranks upside/risk, enforcing "evidence-backed, no guessing," delivered to Telegram with day-by-day tracking.</p>
           <div class="chips"><span class="chip">Scheduling</span><span class="chip">Multi-model AI</span><span class="chip">Telegram</span><span class="chip">Data-driven</span></div>
@@ -292,6 +297,9 @@
       <div class="skillgrid">
         <div class="skillrow"><div class="k">Language &amp; core</div><div class="v">
           <span class="chip">Go (Golang)</span><span class="chip">Concurrency</span><span class="chip">Gin</span><span class="chip">Python</span><span class="chip">TypeScript / React</span>
+        </div></div>
+        <div class="skillrow"><div class="k">Frontend</div><div class="v">
+          <span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Redux Toolkit Query</span><span class="chip">Vite</span>
         </div></div>
         <div class="skillrow"><div class="k">Data &amp; messaging</div><div class="v">
           <span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">NATS JetStream</span><span class="chip">InfluxDB</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span>
@@ -313,13 +321,14 @@
         <div>
           <h3>National Yunlin University of Science and Technology</h3>
           <p>B.S., Computer Science &amp; Information Engineering · 雲林科技大學 資訊工程系</p>
+          <p style="margin-top:.25rem;font-family:var(--mono);font-size:.78rem;color:var(--muted);">2019 – 2023</p>
         </div>
       </div>
     </section>
 
     <footer>
       <span>Ray Tsai · 蔡川海</span>
-      <span>Backend Engineer (Go) · Fintech &amp; real-time systems</span>
+      <span>Backend Engineer (Go) · Fintech, real-time systems &amp; full-stack delivery</span>
     </footer>
   </main>
 </div>
