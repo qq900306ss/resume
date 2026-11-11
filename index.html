@@ -182,7 +182,7 @@
 <div class="wrap">
   <main>
     <header class="hero">
-      <p class="role">Backend Engineer · Go · ships full-stack</p>
+      <p class="role">Backend Engineer · Go · real-time systems · ships full-stack</p>
       <h1>Ray Tsai<span class="zh">蔡川海</span></h1>
       <p class="thesis">I build backend systems that move real money — where <b>one duplicated or stale signal means a wrong order in a live brokerage account.</b></p>
 
@@ -197,30 +197,32 @@
 
       <div class="stats" role="list" aria-label="Career highlights">
         <div class="stat" role="listitem"><div class="num">3</div><div class="lbl">live fintech products I own end to end</div></div>
-        <div class="stat" role="listitem"><div class="num">2,385</div><div class="lbl">commits across 22 months</div></div>
-        <div class="stat" role="listitem"><div class="num"><em>60%</em></div><div class="lbl">of the core product API server</div></div>
+        <div class="stat" role="listitem"><div class="num">2,728</div><div class="lbl">commits across 24 months</div></div>
+        <div class="stat" role="listitem"><div class="num"><em>Top 3</em></div><div class="lbl">of 15 contributors to a 1.3M-line Go monorepo</div></div>
         <div class="stat" role="listitem"><div class="num">NT$400K<em>+</em></div><div class="lbl">monthly volume processed</div></div>
       </div>
     </header>
 
     <section>
       <div class="sec-head">
-        <div><p class="eyebrow">Experience</p><h2>Sole backend owner of three trading products</h2></div>
+        <div><p class="eyebrow">Experience</p><h2>Backend owner of three live trading products</h2></div>
       </div>
       <div class="job-top">
         <h3>Sky Mirror Technology (天鏡科技) — Backend Engineer</h3>
         <span class="when">2024 — present · Taichung</span>
       </div>
-      <p class="job-sub">Backend owner for ElTrade (strategy-signal platform), ParaNinja (quantitative trading) and SikaX (order-execution terminal) — API design, concurrency architecture, data layer, payments, Kubernetes deployment and on-call, end to end on a ~920K-line Go monorepo (470+ endpoints, 450 migration versions), where I personally run 10+ of its production services. Second-largest contributor repo-wide, and I ship the front ends for these products too.</p>
+      <p class="job-sub">Backend owner for ElTrade (strategy-signal platform), ParaNinja (quantitative trading) and SikaX (order-execution terminal) — API design, concurrency architecture, data layer, payments, Kubernetes deployment and on-call, end to end on a ~1.3M-line Go monorepo (1,000+ HTTP routes on the main API server, 600+ migration versions), where I run about 10 of its production services. One of the top three of 15 contributors, author of about half the commits on the main product API server, and I ship the front ends for these products too.</p>
       <div class="facets">
         <div class="facet"><span class="tag">Payments</span><p>Built the NewebPay integration and ECPay flow — recurring billing, refunds, reconciliation — processing <b>NT$400K+ / month</b> with fully automated government e-invoicing.</p></div>
         <div class="facet"><span class="tag">Live&nbsp;trading</span><p><b>~50 signal writes/sec</b> at peak through a three-layer dedup defense plus idempotent NATS JetStream msgIDs, so redelivery storms never double-execute a real order.</p></div>
         <div class="facet"><span class="tag">Combo&nbsp;engine</span><p>Workflow engine blending multi-strategy signals by weight into one net position, with fixed-point math (±10000 bps) and configurable lot rounding.</p></div>
         <div class="facet"><span class="tag">Notifications</span><p>Standalone microservice for all products — 10-worker async pool, Redis email queue with squared backoff, two-tier Telegram rate limiting, SSRF-hardened webhooks.</p></div>
         <div class="facet"><span class="tag">Identity</span><p>OAuth 2.0 on both sides — provider (auth-code, scoped delegation) and consumer (Google / LINE) with multi-provider account binding.</p></div>
-        <div class="facet"><span class="tag">Front&nbsp;end</span><p>Top contributor to the ParaNinja front end at <b>54% of its commits</b>; 570 commits on the primary trading front end and 36% of the admin console — API design and shipped UI owned by the same person.</p></div>
+        <div class="facet"><span class="tag">Front&nbsp;end</span><p>Top contributor to the ParaNinja front end at <b>51% of its commits</b>; 859 commits on the primary trading front end and 44% of the admin console — API design and shipped UI owned by the same person.</p></div>
         <div class="facet"><span class="tag">Mentoring</span><p>Since <b>July 2026</b>, onboarding three new backend engineers — architecture walkthroughs, task shaping, and code review gate-keeping standards and production-risk patterns.</p></div>
         <div class="facet"><span class="tag">Reliability</span><p>Unified WebSocket transport, hot/cold data archival, two-phase GDPR anonymization, and 30+ production cron jobs with a p50/p95/p99 dashboard.</p></div>
+        <div class="facet"><span class="tag">Data&nbsp;migration</span><p>Designed the InfluxDB → ClickHouse move for market data: <b>4.34 billion rows in 58 minutes</b>, zero failures, zero differences across 12,704 candle checks. Live in the simulation environment; production cutover pending.</p></div>
+        <div class="facet"><span class="tag">Cloud &amp; isolation</span><p>Built a production-replica simulation environment that fails closed (in-namespace-only outbound dialing, allowlisted table restore without credentials), and am part of a three-person team moving the platform to AWS EKS.</p></div>
       </div>
     </section>
 
@@ -229,6 +231,15 @@
         <div><p class="eyebrow">Selected incidents</p><h2>Root cause, or it isn't fixed</h2></div>
       </div>
       <div class="incidents">
+        <article class="inc">
+          <span class="cat">Concurrency · backpressure</span>
+          <h4>A market-data service OOM-killed every 22 minutes</h4>
+          <div class="body">
+            <p class="row"><b>Cause</b>After coverage grew from 100 to 2,050 symbols, every candle close spawned a sleep-and-requery goroutine against a 4-connection pool. Prometheus showed goroutines climbing ~2,850 per minute until the 1 GiB limit.</p>
+            <p class="row"><b>Fix</b>Persist closed candles from memory in batches: poison batches dropped, transient errors backed off, failures alerted to Slack.</p>
+            <p class="result">Goroutines <span class="big">~70,000&nbsp;→&nbsp;~8,400</span> flat, zero restarts next session.</p>
+          </div>
+        </article>
         <article class="inc">
           <span class="cat">Idempotency · distributed delivery</span>
           <h4>A single signal written 29 times, 703 rows polluted</h4>
@@ -275,10 +286,10 @@
       <div class="projects">
         <article class="proj">
           <h3>Badminton session manager</h3>
-          <p class="links" style="margin:0 0 .55rem;font-family:var(--mono);font-size:.72rem;"><a href="https://d2mg2bpjvlg672.cloudfront.net/" target="_blank" rel="noopener">live app</a> · <a href="https://d1r9u0ja59y4rv.cloudfront.net/" target="_blank" rel="noopener">admin</a> · <a href="https://github.com/qq900306ss/badminton-booking" target="_blank" rel="noopener">source</a></p>
-          <span class="live"><span class="pulse"></span>Live · real users</span>
-          <p>Solo 0→1 product — backend, frontend, DevOps. Started on <b>AWS Lambda + DynamoDB</b>; when Lambda couldn't hold WebSockets I migrated the backend to a <b>256 MB Fly.io machine</b> and hand-wrote an in-process WebSocket hub. Google / LINE OAuth from scratch and a fair-rotation waitlist algorithm.</p>
-          <div class="chips"><span class="chip">Go · Gin</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span><span class="chip">OAuth 2.0</span></div>
+          <p class="links" style="margin:0 0 .55rem;font-family:var(--mono);font-size:.72rem;"><a href="https://badminton-tw.fyi/" target="_blank" rel="noopener">live app</a> · <a href="https://host.badminton-tw.fyi/" target="_blank" rel="noopener">admin</a> · <a href="https://apps.apple.com/tw/app/id6818015879" target="_blank" rel="noopener">iOS App Store</a></p>
+          <span class="live"><span class="pulse"></span>Live · real users · App Store</span>
+          <p>Solo 0→1 product — backend, frontend, DevOps. Built the backend in Go first: started on <b>AWS Lambda + DynamoDB</b>, then moved to a <b>256 MB Fly.io machine</b> with a hand-written in-process WebSocket hub when Lambda couldn't hold WebSockets; in October 2026 I rewrote it in <b>Rust</b>, which now runs production. Cut realtime bandwidth with permessage-deflate and push coalescing; Google / LINE OAuth from scratch; shipped to the iOS App Store (Taiwan, Japan).</p>
+          <div class="chips"><span class="chip">Go · Gin</span><span class="chip">Rust</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span><span class="chip">OAuth 2.0</span><span class="chip">iOS</span></div>
         </article>
         <article class="proj">
           <h3>Taiwan-stock AI briefing</h3>
@@ -302,10 +313,10 @@
           <span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Redux Toolkit Query</span><span class="chip">Vite</span>
         </div></div>
         <div class="skillrow"><div class="k">Data &amp; messaging</div><div class="v">
-          <span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">NATS JetStream</span><span class="chip">InfluxDB</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span>
+          <span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">NATS JetStream</span><span class="chip">ClickHouse</span><span class="chip">InfluxDB</span><span class="chip">DynamoDB</span><span class="chip">WebSocket</span>
         </div></div>
         <div class="skillrow"><div class="k">Infra &amp; cloud</div><div class="v">
-          <span class="chip">Kubernetes</span><span class="chip">Docker</span><span class="chip">Helm</span><span class="chip">AWS Lambda</span><span class="chip">Fly.io</span>
+          <span class="chip">Kubernetes</span><span class="chip">Docker</span><span class="chip">Helm</span><span class="chip">AWS (EKS, Lambda)</span><span class="chip">GCP</span><span class="chip">Prometheus</span><span class="chip">Fly.io</span>
         </div></div>
         <div class="skillrow"><div class="k">Practices</div><div class="v">
           <span class="chip">Idempotency</span><span class="chip">Distributed systems</span><span class="chip">System design</span><span class="chip">Payments / OAuth 2.0</span><span class="chip">Incident root-cause</span>
